@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuis Pancasila Kelas 6 Ceria</title>
+<style>
+  body { font-family: 'Comic Sans MS', Arial, sans-serif; background: linear-gradient(to bottom, #d1f2eb, #ffffff); padding: 20px; }
+  h1 { text-align: center; color: #16a085; }
+  #timer { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+  #progress-container { width: 100%; background: #ddd; border-radius: 10px; margin-bottom: 20px; height: 20px; }
+  #progress-bar { width: 0%; height: 100%; background: #2980b9; border-radius: 10px; transition: width 0.3s; }
+  .soal { margin-bottom: 20px; background: #fef9e7; padding: 15px; border-radius: 12px; box-shadow: 0 0 8px rgba(0,0,0,0.2); }
+  .jawaban label { display: block; margin: 5px 0; cursor: pointer; padding: 8px; border-radius: 8px; border: 1px solid transparent; transition: 0.2s; font-size: 16px; }
+  .jawaban input[type=radio] { margin-right: 10px; }
+  .jawaban label:hover { background-color: #d5f5e3; }
+  .correct { background-color: #d4edda !important; color: #155724; border-color: #28a745 !important; }
+  .wrong { background-color: #f8d7da !important; color: #721c24; border-color: #dc3545 !important; }
+  .result { font-size: 24px; text-align: center; margin-top: 20px; font-weight: bold; color: #c0392b; }
+  button { display: block; margin: 20px auto; padding: 12px 25px; font-size: 18px; background: #16a085; color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px #117864; }
+  button:active { box-shadow: 0 2px #117864; transform: translateY(2px); }
+  @media(max-width:600px){ .jawaban label{font-size:14px; padding:6px;} }
+</style>
+</head>
+<body>
+
+<h1>Kuis Pancasila Kelas 6 Ceria</h1>
+<div id="timer">25:00</div>
+<div id="progress-container"><div id="progress-bar"></div></div>
+
+<form id="kuisForm"></form>
+
+<div class="result" id="result"></div>
+<button id="selesaiBtn">Selesai</button>
+
+<script>
+// Soal Kelas 6
+const soalData = [
+{soal:"Pancasila sebagai pandangan hidup bangsa berarti…",pilihan:["Hanya sebagai simbol negara","Pedoman hidup sehari-hari bangsa Indonesia","Hanya dihafal saja","Hanya untuk pejabat"],jawaban:"Pedoman hidup sehari-hari bangsa Indonesia"},
+{soal:"Kedudukan Pancasila sebagai dasar negara menunjukkan…",pilihan:["Pancasila menjadi pedoman tertinggi dalam penyelenggaraan negara","Pancasila hanya sebagai hiasan","Pancasila hanya berlaku di sekolah","Pancasila bisa diubah setiap saat"],jawaban:"Pancasila menjadi pedoman tertinggi dalam penyelenggaraan negara"},
+{soal:"Contoh penerapan nilai Pancasila di lingkungan sekolah adalah…",pilihan:["Saling menghormati teman dari agama berbeda","Membully teman","Mengambil hak teman","Membuang sampah sembarangan"],jawaban:"Saling menghormati teman dari agama berbeda"},
+{soal:"Hubungan antar-sila Pancasila berarti…",pilihan:["Setiap sila bisa dijalankan sendiri tanpa memperhatikan yang lain","Semua sila saling mendukung dan tidak bisa dipisahkan","Sila pertama lebih penting dari yang lain","Sila terakhir tidak perlu dijalankan"],jawaban:"Semua sila saling mendukung dan tidak bisa dipisahkan"},
+{soal:"Manfaat penerapan nilai Pancasila bagi masyarakat adalah…",pilihan:["Hidup tertib, rukun, dan saling menghormati","Hidup bebas tanpa aturan","Hidup untuk kepentingan sendiri","Hidup tanpa peduli orang lain"],jawaban:"Hidup tertib, rukun, dan saling menghormati"},
+{soal:"Norma dan aturan berfungsi untuk…",pilihan:["Mengatur tingkah laku manusia agar tertib dan aman","Membatasi kebebasan tanpa alasan","Membuat orang takut","Mengatur pakaian saja"],jawaban:"Mengatur tingkah laku manusia agar tertib dan aman"},
+{soal:"Hak berarti…",pilihan:["Sesuatu yang dimiliki dan diterima","Sesuatu yang harus dilakukan","Sesuatu yang bisa dicuri","Sesuatu yang tidak penting"],jawaban:"Sesuatu yang dimiliki dan diterima"},
+{soal:"Kewajiban berarti…",pilihan:["Sesuatu yang harus dilakukan","Sesuatu yang bisa diabaikan","Sesuatu yang menyenangkan saja","Sesuatu yang dimiliki teman"],jawaban:"Sesuatu yang harus dilakukan"},
+{soal:"Cara membuat aturan di lingkungan sekolah biasanya melalui…",pilihan:["Musyawarah bersama guru dan siswa","Satu orang memutuskan sendiri","Hanya guru yang membuat","Hanya siswa yang membuat"],jawaban:"Musyawarah bersama guru dan siswa"},
+{soal:"Musyawarah mufakat berarti…",pilihan:["Membahas masalah dan mengambil keputusan bersama secara setuju bersama","Memaksakan pendapat sendiri","Membahas masalah tanpa mengambil keputusan","Hanya mendengar keputusan guru"],jawaban:"Membahas masalah dan mengambil keputusan bersama secara setuju bersama"},
+{soal:"Hak dan kewajiban dalam menyusun aturan harus…",pilihan:["Dipatuhi semua anggota masyarakat","Diabaikan oleh sebagian orang","Hanya diikuti oleh pejabat","Hanya berlaku untuk siswa"],jawaban:"Dipatuhi semua anggota masyarakat"},
+{soal:"Mematuhi aturan berarti…",pilihan:["Mengikuti aturan yang berlaku dengan disiplin","Mengabaikan aturan jika tidak suka","Hanya mengikuti aturan saat diawasi","Mengubah aturan sesuai keinginan sendiri"],jawaban:"Mengikuti aturan yang berlaku dengan disiplin"},
+{soal:"Bhinneka Tunggal Ika berarti…",pilihan:["Berbeda-beda tetapi tetap satu jua","Semua sama persis","Tidak perlu menghormati perbedaan","Hanya berlaku di kota besar"],jawaban:"Berbeda-beda tetapi tetap satu jua"},
+{soal:"Melestarikan dan menghormati kebinekaan berarti…",pilihan:["Menghargai perbedaan suku, agama, budaya, dan adat istiadat","Mengejek yang berbeda","Memaksakan budaya sendiri","Menjauhi yang berbeda"],jawaban:"Menghargai perbedaan suku, agama, budaya, dan adat istiadat"},
+{soal:"Makna persatuan dan kesatuan adalah…",pilihan:["Hidup rukun dan saling menghormati dalam perbedaan","Hidup sendiri-sendiri","Mengabaikan orang lain","Hidup tanpa aturan"],jawaban:"Hidup rukun dan saling menghormati dalam perbedaan"},
+{soal:"Keutuhan bangsa dapat dijaga dengan…",pilihan:["Mematuhi aturan, menghormati perbedaan, dan bekerja sama","Mengabaikan hukum","Memaksakan pendapat sendiri","Mengutamakan kelompok sendiri"],jawaban:"Mematuhi aturan, menghormati perbedaan, dan bekerja sama"},
+{soal:"Contoh kerja sama dalam keragaman di provinsi dan negara adalah…",pilihan:["Bekerja sama antar-suku dan agama dalam pembangunan","Mengabaikan kelompok lain","Hanya bekerja sama dengan teman sendiri","Tidak peduli perbedaan"],jawaban:"Bekerja sama antar-suku dan agama dalam pembangunan"},
+{soal:"Gotong royong dalam persatuan bangsa dilakukan untuk…",pilihan:["Mencapai tujuan bersama dan saling membantu","Menang sendiri","Bersaing tanpa peduli orang lain","Memaksakan kehendak"],jawaban:"Mencapai tujuan bersama dan saling membantu"},
+{soal:"Gotong royong lingkup provinsi dan negara contohnya…",pilihan:["Membantu korban bencana, menjaga kebersihan fasilitas umum","Bermain di taman","Mengadakan lomba tanpa tujuan sosial","Mencari keuntungan sendiri"],jawaban:"Membantu korban bencana, menjaga kebersihan fasilitas umum"},
+{soal:"Penerapan nilai Pancasila sehari-hari di masyarakat meliputi…",pilihan:["Menghormati orang lain, patuh aturan, dan bekerja sama","Mengganggu orang lain","Mengabaikan aturan","Membeda-bedakan orang berdasarkan suku atau agama"],jawaban:"Menghormati orang lain, patuh aturan, dan bekerja sama"}
+];
+
+let jawabanUser = JSON.parse(localStorage.getItem("jawabanUser6")) || {};
+const form = document.getElementById("kuisForm");
+const progressBar = document.getElementById("progress-bar");
+
+function renderSoal(){
+  form.innerHTML = "";
+  soalData.forEach((s,index)=>{
+    const div = document.createElement("div");
+    div.className = "soal";
+    div.innerHTML = `<strong>${index+1}. ${s.soal}</strong><div class="jawaban"></div>`;
+    const jawabanDiv = div.querySelector(".jawaban");
+    s.pilihan.forEach(pil=>{
+      const checked = jawabanUser[index] === pil ? "checked" : "";
+      const id = `soal${index}_${pil}`;
+      jawabanDiv.innerHTML += `
+        <label for="${id}">
+          <input type="radio" name="soal${index}" id="${id}" value="${pil}" ${checked}> ${pil}
+        </label>
+      `;
+    });
+    form.appendChild(div);
+  });
+
+  form.querySelectorAll("input[type=radio]").forEach(input=>{
+    input.addEventListener("change",(e)=>{
+      const idx = parseInt(e.target.name.replace("soal",""));
+      jawabanUser[idx] = e.target.value;
+      localStorage.setItem("jawabanUser6",JSON.stringify(jawabanUser));
+      updateProgress();
+    });
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  let answered = Object.keys(jawabanUser).length;
+  let percent = (answered/soalData.length)*100;
+  progressBar.style.width = percent+"%";
+}
+
+renderSoal();
+
+// Timer
+let timeLeft = 25*60;
+const timerEl = document.getElementById("timer");
+const timer = setInterval(()=>{
+  let minutes = Math.floor(timeLeft/60);
+  let seconds = timeLeft%60;
+  timerEl.textContent = `${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2,"0")}`;
+  if(timeLeft>600) timerEl.style.color="#27ae60";
+  else if(timeLeft>300) timerEl.style.color="#f1c40f";
+  else timerEl.style.color="#e74c3c";
+  if(timeLeft<=0){ clearInterval(timer); selesai(); }
+  timeLeft--;
+},1000);
+
+document.getElementById("selesaiBtn").addEventListener("click",selesai);
+
+function selesai(){
+  clearInterval(timer);
+  let score = 0;
+  soalData.forEach((s,index)=>{
+    const div = form.children[index];
+    const pilihanEls = div.querySelectorAll("input");
+    pilihanEls.forEach(input=>{
+      input.disabled = true;
+      const label = input.parentElement;
+      if(input.value === s.jawaban){
+        label.classList.add("correct");
+        label.innerHTML += " ✔";
+      }
+      if(jawabanUser[index] && jawabanUser[index] !== s.jawaban && input.checked){
+        label.classList.add("wrong");
+        label.innerHTML += " ✖";
+      }
+    });
+    if(jawabanUser[index] === s.jawaban) score++;
+  });
+  const nilai = Math.round((score/soalData.length)*100);
+  document.getElementById("result").textContent = `Nilai Anda: ${nilai}`;
+}
+</script>
+</body>
+</html>
